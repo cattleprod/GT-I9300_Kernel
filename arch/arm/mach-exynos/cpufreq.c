@@ -910,8 +910,19 @@ ssize_t store_UV_mV_table(struct cpufreq_policy *policy,
 		
 		for (i = 0; i < 6; i++) {
 			int rest = 0;
-
-			t[i] *= 1000;
+			int validate = 0;
+			int number = t[i];
+			
+			/* Add in a safety when accepting 6-7 digit inputs
+			 * to avoid accidentally setting voltages too high
+			 */
+			while(number){
+				validate++;
+				number /= 10;
+			}
+			if(validate >=3 && validate <5){
+				t[i] *= 1000;
+			}
 
 			if((rest = t[i] % 12500) != 0){
 				if(rest > 6250)
